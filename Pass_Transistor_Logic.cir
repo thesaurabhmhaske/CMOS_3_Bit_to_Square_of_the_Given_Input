@@ -1,0 +1,76 @@
+*** 3-Bit Binary to square of the Given Input Using Pass-Transistor Logic ***
+
+.subckt inverter 1 2 3
+M1n 2 1 0 0 nmod w = 40u l = 1u
+M1p 2 1 3 3 pmod w = 40u l = 1u
+
+.model nmod nmos level = 54 version = 4.7
+.model pmod pmos level = 54 version = 4.7
+.ends
+
+.subckt pass_and 1 2 3 4
+M1n 1 2 3 3 nmod w = 40u l = 1u
+M2n 2 4 3 3 nmod w = 40u l = 1u
+
+.model nmod nmos level = 54 version = 4.7
+.ends
+
+.subckt pass_or 1 2 3 4
+M1n 1 4 3 3 nmod w = 40u l = 1u
+M2n 2 2 3 3 nmod w = 40u l = 1u
+
+.model nmod nmos level = 54 version = 4.7
+.ends
+
+.subckt pass_xor 1 2 3 4 5
+M1n 1 5 3 3 nmod w = 40u l = 1u
+M2n 4 2 3 3 nmod w = 40u l = 1u
+
+.model nmod nmos level = 54 version = 4.7
+.ends
+
+Vdd 1 0 dc 5V
+Va 10 0 pulse(0 5 0 0 0 20ns 40ns)
+Vb 11 0 pulse(0 5 0 0 0 15ns 30ns)
+Vc 12 0 pulse(0 5 0 0 0 10ns 20ns)
+Vd 13 0 pulse(0 5 0 0 0 5ns 10ns)
+
+xa 10 14 1 inverter
+xb 11 15 1 inverter
+xc 12 16 1 inverter
+xd 13 27 1 inverter
+
+xa_and_b 10 11 17 15 pass_and
+
+xa_and_b' 10 15 18 11 pass_and
+xa_and_c 10 12 19 16 pass_and
+xe 19 24 1 inverter
+xa_and_b'_or_e 18 19 20 24 pass_or
+
+xa_xor_b 10 11 21 14 15 pass_xor
+xf_and_c 21 12 22 16 pass_and
+
+xb_and_c' 11 16 23 12 pass_and
+
+xd_and_d 13 13 25 27 pass_and
+xc_and_c 12 12 26 16 pass_and
+
+.tran 0.1ns 40ns
+.control
+run
+
+plot W(10) title 'W 1st_input bit' xlabel 'Time' ylabel 'Output'
+plot X(11) title 'X 2nd_input bit' xlabel 'Time' ylabel 'Output'
+plot Y(12) title 'Y 3rd_input bit' xlabel 'Time' ylabel 'Output'
+plot Z(13) title 'Z 4th_input bit' xlabel 'Time' ylabel 'Output'
+
+plot A(17) title 'A 1st_output bit' xlabel 'Time' ylabel 'Output'
+plot B(20) title 'B 2nd_output bit' xlabel 'Time' ylabel 'Output'
+plot C(22) title 'C 3rd_output bit' xlabel 'Time' ylabel 'Output'
+plot D(23) title 'D 4th_output bit' xlabel 'Time' ylabel 'Output'
+plot E(25) title 'E 5th_output bit' xlabel 'Time' ylabel 'Output'
+plot F(26) title 'F 6th_output bit' xlabel 'Time' ylabel 'Output'
+
+.endc
+.end
+
